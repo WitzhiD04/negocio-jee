@@ -1,0 +1,102 @@
+classDiagram
+    direction TB
+
+    class SolicitudResource {
+        +registrar(SolicitudEntrada) Response
+        +consultarTodas() List~SolicitudSalida~
+        +buscarPorId(long) SolicitudSalida
+        +consultarPendientes() List~SolicitudSalida~
+        +atender(long) SolicitudSalida
+    }
+
+    class SolicitudEntrada {
+        <<DTO>>
+        +String descripcionDesastre
+        +String tipoRecurso
+        +int cantidad
+        +Prioridad prioridad
+    }
+
+    class SolicitudSalida {
+        <<DTO>>
+        +long id
+        +String descripcionDesastre
+        +String tipoRecurso
+        +int cantidad
+        +Prioridad prioridad
+        +EstadoSolicitud estado
+        +desde(SolicitudRecurso)$ SolicitudSalida
+    }
+
+    class ErrorSalida {
+        <<DTO>>
+        +String error
+    }
+
+    class GestionSolicitudes {
+        <<Local interface>>
+        +registrar(String descripcionDesastre, String tipoRecurso, int cantidad, Prioridad prioridad) SolicitudRecurso
+        +consultarTodas() List~SolicitudRecurso~
+        +buscarPorId(long id) SolicitudRecurso
+        +consultarPendientes() List~SolicitudRecurso~
+        +atender(long id) SolicitudRecurso
+    }
+
+    class GestionSolicitudesBean {
+        <<Stateless>>
+        -SolicitudRepository repositorio
+    }
+
+    class SolicitudRepository {
+        <<interface>>
+        +guardar(SolicitudRecurso) SolicitudRecurso
+        +actualizar(SolicitudRecurso) SolicitudRecurso
+        +buscarPorId(long id) Optional~SolicitudRecurso~
+        +listarTodas() List~SolicitudRecurso~
+    }
+
+    class SolicitudRepositoryMemoria {
+        <<Singleton>>
+        -ConcurrentHashMap~Long, SolicitudRecurso~ solicitudes
+        -AtomicLong secuencia
+    }
+
+    class SolicitudRecurso {
+        -Long id
+        -String descripcionDesastre
+        -String tipoRecurso
+        -int cantidad
+        -Prioridad prioridad
+        -EstadoSolicitud estado
+    }
+
+    class EstadoSolicitud {
+        <<enumeration>>
+        PENDIENTE
+        ATENDIDA
+    }
+
+    class Prioridad {
+        <<enumeration>>
+        ALTA
+        MEDIA
+        BAJA
+    }
+
+    class SolicitudInvalidaException
+    class SolicitudNoEncontradaException
+    class SolicitudYaAtendidaException
+
+    SolicitudResource --> GestionSolicitudes : usa
+    SolicitudResource ..> SolicitudEntrada : recibe
+    SolicitudResource ..> SolicitudSalida : devuelve
+    SolicitudResource ..> ErrorSalida : devuelve en error
+    SolicitudSalida ..> SolicitudRecurso : se construye desde
+    GestionSolicitudesBean ..|> GestionSolicitudes
+    GestionSolicitudesBean --> SolicitudRepository : usa
+    SolicitudRepositoryMemoria ..|> SolicitudRepository
+    GestionSolicitudesBean ..> SolicitudInvalidaException : lanza
+    GestionSolicitudesBean ..> SolicitudNoEncontradaException : lanza
+    GestionSolicitudesBean ..> SolicitudYaAtendidaException : lanza
+    SolicitudRecurso --> EstadoSolicitud
+    SolicitudRecurso --> Prioridad
