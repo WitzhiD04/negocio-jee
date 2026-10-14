@@ -121,7 +121,7 @@ Payara 7.
 
 | Paquete | Contenido | Tier |
 |---|---|---|
-| `solicitud.rest` | `SolicitudResource` (JAX-RS), `ExceptionMapper`s | Presentación |
+| `solicitud.rest` | `SolicitudResource` (JAX-RS, `@RequestScoped`), `ExceptionMapper`s | Presentación |
 | `solicitud.rest.dto` | `SolicitudEntrada`, `SolicitudSalida`, `ErrorSalida` | Presentación |
 | `solicitud.negocio` | `GestionSolicitudes` (interfaz `@Local`), `GestionSolicitudesBean` (`@Stateless`), `SolicitudRepository` (interfaz), excepciones de negocio | Negocio |
 | `solicitud.modelo` | `SolicitudRecurso`, `EstadoSolicitud`, `Prioridad` | Dominio (compartido) |
@@ -204,7 +204,7 @@ classDiagram
     }
 
     class GestionSolicitudes {
-        <<interface>>
+        <<Local interface>>
         +registrar(String descripcionDesastre, String tipoRecurso, int cantidad, Prioridad prioridad) SolicitudRecurso
         +consultarTodas() List~SolicitudRecurso~
         +buscarPorId(long id) SolicitudRecurso
@@ -334,6 +334,7 @@ envuelve en `EJBException` y la capa REST puede traducirlas a un código HTTP.
 | La cantidad debe ser mayor que cero | `registrar` | `SolicitudInvalidaException` | 400 |
 | La descripción del desastre es obligatoria | `registrar` | `SolicitudInvalidaException` | 400 |
 | El tipo de recurso es obligatorio | `registrar` | `SolicitudInvalidaException` | 400 |
+| La prioridad es obligatoria (supuesto, ver sección 9) | `registrar` | `SolicitudInvalidaException` | 400 |
 | Toda solicitud nueva inicia en `PENDIENTE` | `registrar` (el EJB fija el estado; el cliente no lo envía) | — | — |
 | No se puede atender una solicitud inexistente | `atender` | `SolicitudNoEncontradaException` | 404 |
 | No se puede atender una solicitud ya `ATENDIDA` | `atender` | `SolicitudYaAtendidaException` | 409 |
@@ -366,7 +367,7 @@ stateDiagram-v2
 
 | Estado actual | Evento | Condición | Estado siguiente | Resultado |
 |---|---|---|---|---|
-| (no existe) | `registrar` | cantidad > 0, descripción y tipo presentes | `PENDIENTE` | solicitud creada |
+| (no existe) | `registrar` | cantidad > 0, descripción, tipo y prioridad presentes | `PENDIENTE` | solicitud creada |
 | (no existe) | `registrar` | algún dato inválido | (no se crea) | `SolicitudInvalidaException` |
 | (no existe) | `atender` | — | (no existe) | `SolicitudNoEncontradaException` |
 | `PENDIENTE` | `atender` | — | `ATENDIDA` | solicitud actualizada |
@@ -484,6 +485,23 @@ Respuesta de error (ejemplo 400):
   enumerado `ALTA`, `MEDIA`, `BAJA` y se trata como dato obligatorio.
 - **Sin persistencia duradera.** Los datos se pierden al reiniciar el servidor, lo cual el
   enunciado admite al pedir una colección en memoria.
-- **Evidencias.** Se obtendrán por dos vías: llamadas a los endpoints REST sobre Payara y
-  pruebas JUnit 5 del EJB con un repositorio en memoria (requiere añadir JUnit al `pom.xml`
-  con alcance `test`).
+- **Interfaz local.** Siguiendo la vista local de los EJB de sesión, `GestionSolicitudes` se
+  anota con `@Local`: los clientes (la capa REST) están en la misma JVM. No se necesita una
+  interfaz `@Remote` porque ningún cliente invoca el EJB desde otra máquina.
+- **Inyección con CDI.** El EJB recibe el repositorio con `@Inject` y la capa REST recibe el
+  EJB igual; por eso `SolicitudResource` se marca `@RequestScoped`, para que CDI lo gestione.
+  El EJB tiene dos constructores: el vacío, que usa el contenedor, y uno que recibe el
+  repositorio, que usan las pruebas.
+- **Evidencias.** Se obtienen por dos vías: llamadas a los endpoints REST sobre Payara y
+  pruebas JUnit 5 del EJB con un repositorio falso (`SolicitudRepositoryFalso`).
+
+## 10. Cómo ejecutar
+
+```text
+mvn clean package     # compila, ejecuta las 13 pruebas JUnit y genera target/negocio-jee.war
+mvn cargo:run         # descarga Payara 7, despliega el WAR y queda escuchando en el puerto 8080
+mvn cargo:stop        # (en otra terminal) detiene el servidor
+```
+
+Alternativa con Docker: `docker build -t negocio-jee .` y
+`docker run -p 8080:8080 negocio-jee`.
