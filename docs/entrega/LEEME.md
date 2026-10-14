@@ -1,4 +1,4 @@
-# Entrega — Taller No. 2 Jakarta EE + Tier de Negocio
+# Entrega: Taller No. 2 Jakarta EE + Tier de Negocio
 
 | Entregable del enunciado | Dónde está |
 |---|---|

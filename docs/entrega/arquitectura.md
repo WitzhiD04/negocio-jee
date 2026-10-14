@@ -1,4 +1,4 @@
-# Diseño de arquitectura — Taller No. 2 Jakarta EE + Tier de Negocio
+# Diseño de arquitectura: Taller No. 2 Jakarta EE + Tier de Negocio
 
 Pontificia Universidad Javeriana · Arquitectura de Software · 2026-30
 
@@ -130,7 +130,7 @@ Payara 7.
 flowchart TB
     cliente["Cliente HTTP<br/>(curl / Postman)"]
 
-    subgraph war["negocio-jee.war — Payara 7"]
+    subgraph war["negocio-jee.war en Payara 7"]
         subgraph rest["Presentación · solicitud.rest"]
             resource["SolicitudResource<br/>(JAX-RS)"]
             mappers["ExceptionMappers"]
@@ -334,7 +334,7 @@ envuelve en `EJBException` y la capa REST puede traducirlas a un código HTTP.
 | La descripción del desastre es obligatoria | `registrar` | `SolicitudInvalidaException` | 400 |
 | El tipo de recurso es obligatorio | `registrar` | `SolicitudInvalidaException` | 400 |
 | La prioridad es obligatoria (supuesto, ver sección 9) | `registrar` | `SolicitudInvalidaException` | 400 |
-| Toda solicitud nueva inicia en `PENDIENTE` | `registrar` (el EJB fija el estado; el cliente no lo envía) | — | — |
+| Toda solicitud nueva inicia en `PENDIENTE` | `registrar` (el EJB fija el estado; el cliente no lo envía) | No aplica | No aplica |
 | No se puede atender una solicitud inexistente | `atender` | `SolicitudNoEncontradaException` | 404 |
 | No se puede atender una solicitud ya `ATENDIDA` | `atender` | `SolicitudYaAtendidaException` | 409 |
 
@@ -368,9 +368,9 @@ stateDiagram-v2
 |---|---|---|---|---|
 | (no existe) | `registrar` | cantidad > 0, descripción, tipo y prioridad presentes | `PENDIENTE` | solicitud creada |
 | (no existe) | `registrar` | algún dato inválido | (no se crea) | `SolicitudInvalidaException` |
-| (no existe) | `atender` | — | (no existe) | `SolicitudNoEncontradaException` |
-| `PENDIENTE` | `atender` | — | `ATENDIDA` | solicitud actualizada |
-| `ATENDIDA` | `atender` | — | `ATENDIDA` | `SolicitudYaAtendidaException` |
+| (no existe) | `atender` | No aplica | (no existe) | `SolicitudNoEncontradaException` |
+| `PENDIENTE` | `atender` | No aplica | `ATENDIDA` | solicitud actualizada |
+| `ATENDIDA` | `atender` | No aplica | `ATENDIDA` | `SolicitudYaAtendidaException` |
 
 No hay transición de `ATENDIDA` a `PENDIENTE` ni operación de eliminación. Las consultas no
 cambian el estado. La máquina la controla `GestionSolicitudesBean`: es el único componente
