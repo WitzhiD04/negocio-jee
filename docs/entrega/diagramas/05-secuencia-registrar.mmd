@@ -1,0 +1,18 @@
+sequenceDiagram
+    actor Cliente
+    participant R as SolicitudResource
+    participant N as GestionSolicitudesBean
+    participant D as SolicitudRepository
+
+    Cliente->>R: POST /solicitudes (JSON)
+    R->>N: registrar(descripcion, tipoRecurso, cantidad, prioridad)
+    alt datos inválidos
+        N-->>R: SolicitudInvalidaException
+        R-->>Cliente: 400 Bad Request
+    else datos válidos
+        N->>N: estado = PENDIENTE
+        N->>D: guardar(solicitud)
+        D-->>N: solicitud con id
+        N-->>R: solicitud
+        R-->>Cliente: 201 Created
+    end

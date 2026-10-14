@@ -1,0 +1,497 @@
+{
+  "info": {
+    "name": "Taller 2 - Gestión de solicitudes de recursos",
+    "description": "Pruebas de las operaciones del tier de negocio (EJB) a través de los endpoints REST. Ejecutar en orden con el Collection Runner.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/negocio-jee/rest"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Registrar",
+      "item": [
+        {
+          "name": "01 Registrar solicitud válida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Inicia en estado PENDIENTE\", () => pm.expect(pm.response.json().estado).to.eql(\"PENDIENTE\"));",
+                  "pm.test(\"Recibe un id asignado por el sistema\", () => pm.expect(pm.response.json().id).to.be.a(\"number\"));",
+                  "pm.collectionVariables.set(\"id1\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionDesastre\": \"Inundación en el barrio La Esperanza\",\n  \"tipoRecurso\": \"Agua potable\",\n  \"cantidad\": 500,\n  \"prioridad\": \"ALTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "02 Registrar segunda solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"id2\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionDesastre\": \"Incendio forestal en el cerro\",\n  \"tipoRecurso\": \"Extintores\",\n  \"cantidad\": 20,\n  \"prioridad\": \"MEDIA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "03 Rechaza cantidad cero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje: La cantidad solicitada debe ser mayor que cero\", () => pm.expect(pm.response.json().error).to.eql(\"La cantidad solicitada debe ser mayor que cero\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionDesastre\": \"Inundación en el barrio La Esperanza\",\n  \"tipoRecurso\": \"Agua potable\",\n  \"cantidad\": 0,\n  \"prioridad\": \"ALTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "04 Rechaza descripción vacía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje: La descripción del desastre es obligatoria\", () => pm.expect(pm.response.json().error).to.eql(\"La descripción del desastre es obligatoria\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionDesastre\": \"\",\n  \"tipoRecurso\": \"Agua potable\",\n  \"cantidad\": 500,\n  \"prioridad\": \"ALTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "05 Rechaza tipo de recurso vacío",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje: El tipo de recurso es obligatorio\", () => pm.expect(pm.response.json().error).to.eql(\"El tipo de recurso es obligatorio\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionDesastre\": \"Inundación en el barrio La Esperanza\",\n  \"tipoRecurso\": \"\",\n  \"cantidad\": 500,\n  \"prioridad\": \"ALTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06 Rechaza solicitud sin prioridad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje: La prioridad es obligatoria\", () => pm.expect(pm.response.json().error).to.eql(\"La prioridad es obligatoria\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionDesastre\": \"Inundación en el barrio La Esperanza\",\n  \"tipoRecurso\": \"Agua potable\",\n  \"cantidad\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Consultar",
+      "item": [
+        {
+          "name": "07 Consultar todas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve las 2 solicitudes válidas (las rechazadas no se guardaron)\", () => pm.expect(pm.response.json().length).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08 Buscar por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve la solicitud pedida\", () => pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get(\"id1\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes/{{id1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes",
+                "{{id1}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "09 Buscar id inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Mensaje: No existe una solicitud con id 999\", () => pm.expect(pm.response.json().error).to.eql(\"No existe una solicitud con id 999\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes/999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes",
+                "999"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Atender",
+      "item": [
+        {
+          "name": "10 Atender solicitud pendiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Pasa a estado ATENDIDA\", () => pm.expect(pm.response.json().estado).to.eql(\"ATENDIDA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes/{{id1}}/atender",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes",
+                "{{id1}}",
+                "atender"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11 Rechaza atender dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes/{{id1}}/atender",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes",
+                "{{id1}}",
+                "atender"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12 Rechaza atender inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes/999/atender",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes",
+                "999",
+                "atender"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Pendientes",
+      "item": [
+        {
+          "name": "13 Consultar pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Solo aparece la solicitud no atendida\", () => {",
+                  "  const lista = pm.response.json();",
+                  "  pm.expect(lista.length).to.eql(1);",
+                  "  pm.expect(lista[0].id).to.eql(Number(pm.collectionVariables.get(\"id2\")));",
+                  "  pm.expect(lista[0].estado).to.eql(\"PENDIENTE\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/solicitudes/pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitudes",
+                "pendientes"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

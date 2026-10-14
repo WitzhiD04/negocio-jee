@@ -1,0 +1,32 @@
+flowchart TB
+    cliente["Cliente HTTP<br/>(curl / Postman)"]
+
+    subgraph war["negocio-jee.war — Payara 7"]
+        subgraph rest["Presentación · solicitud.rest"]
+            resource["SolicitudResource<br/>(JAX-RS)"]
+            mappers["ExceptionMappers"]
+        end
+
+        subgraph negocio["Negocio · solicitud.negocio"]
+            servicio["«interface» GestionSolicitudes"]
+            bean["GestionSolicitudesBean<br/>(@Stateless EJB)"]
+            puerto["«interface» SolicitudRepository"]
+            excepciones["Excepciones de negocio"]
+        end
+
+        subgraph datos["Datos · solicitud.datos"]
+            memoria["SolicitudRepositoryMemoria<br/>(@Singleton EJB)"]
+        end
+
+        modelo["Dominio · solicitud.modelo<br/>SolicitudRecurso, EstadoSolicitud, Prioridad"]
+    end
+
+    cliente -->|HTTP/JSON| resource
+    resource --> servicio
+    bean -.implementa.-> servicio
+    bean --> puerto
+    memoria -.implementa.-> puerto
+    mappers --> excepciones
+    rest --> modelo
+    negocio --> modelo
+    datos --> modelo

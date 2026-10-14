@@ -96,12 +96,11 @@ Dependencias prohibidas, que son las que garantizan el desacoplamiento:
 negocio-jee/
 ├── pom.xml                      Maven · packaging war · Java 21 · Jakarta EE 11
 ├── Dockerfile                   imagen payara/server-full con el WAR
-├── docs/
-│   └── arquitectura.md
+├── docs/entrega/             arquitectura, informe, diagramas, Postman y evidencias
 └── src/
     ├── main/
     │   ├── java/edu/javeriana/negocio/jakarta/
-    │   │   ├── hello/           activador JAX-RS (starter)
+    │   │   ├── hello/           HelloApplication: activador JAX-RS
     │   │   └── solicitud/
     │   │       ├── rest/        SolicitudResource, ExceptionMappers
     │   │       │   └── dto/     SolicitudEntrada, SolicitudSalida, ErrorSalida
@@ -315,7 +314,7 @@ cinco decisiones:
    y genera el identificador. No valida datos ni decide cambios de estado; todas las reglas
    viven en el EJB.
 
-5. **Negocio probable sin servidor.** Como el EJB solo depende de una interfaz, las pruebas
+5. **Negocio que se prueba sin servidor.** Como el EJB solo depende de una interfaz, las pruebas
    JUnit crean `GestionSolicitudesBean` pasándole un repositorio en memoria por constructor
    y verifican las reglas sin desplegar en Payara. Esas pruebas son, a la vez, evidencia de
    que el negocio no está atado al mecanismo de persistencia.

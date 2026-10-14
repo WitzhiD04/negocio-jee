@@ -1,0 +1,50 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------< edu.javeriana.negocio:negocio-jee >------------------
+[INFO] Building negocio-jee 0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ negocio-jee ---
+[INFO] Deleting C:\Users\AMD Ryzen 7\Downloads\negocio-jee\negocio-jee\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ negocio-jee ---
+[INFO] skip non existing resourceDirectory C:\Users\AMD Ryzen 7\Downloads\negocio-jee\negocio-jee\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ negocio-jee ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 18 source files with javac [debug release 21] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ negocio-jee ---
+[INFO] skip non existing resourceDirectory C:\Users\AMD Ryzen 7\Downloads\negocio-jee\negocio-jee\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ negocio-jee ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug release 21] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ negocio-jee ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running edu.javeriana.negocio.jakarta.solicitud.negocio.GestionSolicitudesBeanTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.112 s -- in edu.javeriana.negocio.jakarta.solicitud.negocio.GestionSolicitudesBeanTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- war:3.5.1:war (default-war) @ negocio-jee ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [negocio-jee] in [C:\Users\AMD Ryzen 7\Downloads\negocio-jee\negocio-jee\target\negocio-jee]
+[INFO] Processing war project
+[INFO] Copying webapp resources [C:\Users\AMD Ryzen 7\Downloads\negocio-jee\negocio-jee\src\main\webapp]
+[INFO] Building war: C:\Users\AMD Ryzen 7\Downloads\negocio-jee\negocio-jee\target\negocio-jee.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  6.593 s
+[INFO] Finished at: 2026-10-14T17:02:44-05:00
+[INFO] ------------------------------------------------------------------------

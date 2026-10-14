@@ -1,0 +1,15 @@
+stateDiagram-v2
+    [*] --> PENDIENTE : registrar() [datos válidos]
+    PENDIENTE --> ATENDIDA : atender()
+    ATENDIDA --> [*]
+
+    note right of PENDIENTE
+        Estado inicial obligatorio.
+        Aparece en consultarPendientes().
+    end note
+
+    note right of ATENDIDA
+        Estado final.
+        atender() se rechaza con
+        SolicitudYaAtendidaException.
+    end note
